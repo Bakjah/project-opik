@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aetheria | Fantasy Illustrator Portfolio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        /* --- DESIGN SYSTEM & VARIABLES --- */
+        :root {
+            --bg-dark: #0d121d;
+            --bg-card: rgba(18, 26, 41, 0.75);
+            --gold-premium: #ece2b6;
+            --gold-bright: #ffd700;
+            --anemo-teal: #4ef2d2;
+            --text-main: #f4f5f6;
+            --text-muted: #a5b1c2;
+            --fantasy-border: rgba(236, 226, 182, 0.15);
+            --font-fantasy: 'Cinzel', serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            overflow: hidden; /* Dikunci dulu saat loading/gatekeeper */
+            position: relative;
+        }
+
+        /* --- 1. INITIAL LOADING SCREEN --- */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #080b11;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease;
+        }
+
+        .loading-logo {
+            font-family: var(--font-fantasy);
+            color: var(--gold-premium);
+            font-size: 2rem;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        .loading-bar-container {
+            width: 250px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(236, 226, 182, 0.1);
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--gold-premium));
+            box-shadow: 0 0 8px var(--gold-bright);
+            transition: width 0.1s linear;
+        }
+
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 5px rgba(236, 226, 182, 0.2); opacity: 0.6; }
+            100% { text-shadow: 0 0 20px rgba(236, 226, 182, 0.8); opacity: 1; }
+        }
+
+        /* --- 2. GAME TITLE SCREEN (GATEKEEPER) --- */
+        #title-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 1.2s cubic-bezier(0.7, 0, 0.3, 1), opacity 1.2s ease;
+        }
+
+        #title-screen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Gerakan zoom lambat untuk bg gerbang */
+        .title-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            filter: brightness(0.6) contrast(1.05);
+            animation: gateZoom 30s infinite alternate;
+        }
+
+        @keyframes gateZoom {
+            0% { transform: scale(1.05); }
+            100% { transform: scale(1.12); }
+        }
+
+        .title-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 30%, #080b11 100%);
+            z-index: -1;
+        }
+
+        .title-logo-large {
+            font-family: var(--font-fantasy);
+            font-size: 4rem;
+            letter-spacing: 8px;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.2), 0 5px 15px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .title-sub {
+            font-family: var(--font-fantasy);
+            color: var(--gold-premium);
+            font-size: 0.9rem;
+            letter-spacing: 6px;
+            margin-bottom: 120px;
+            opacity: 0.8;
+        }
+
+        /* Tombol Klik Masuk Khas Game AAA */
+        .btn-start-game {
+            background: transparent;
+            border: none;
+            color: var(--gold-premium);
+            font-family: var(--font-fantasy);
+            font-size: 1.1rem;
+            letter-spacing: 4px;
+            cursor: pointer;
+            padding: 15px 40px;
+            position: relative;
+            animation: blinkText 2.5s infinite;
+            transition: 0.4s;
+        }
+
+        .btn-start-game:hover {
+            color: #fff;
+            text-shadow: 0 0 15px var(--gold-bright);
+            animation-play-state: paused;
+        }
+
+        .btn-start-game::before, .btn-start-game::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-color: var(--gold-premium);
+            border-style: solid;
+            transition: 0.3s;
+            opacity: 0.6;
+        }
+        /* Ornamen bingkai tombol sudut kiri atas & kanan bawah */
+        .btn-start-game::before { top: 0; left: 0; border-width: 2px 0 0 2px; }
+        .btn-start-game::after { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+        .btn-start-game:hover::before { transform: translate(-5px, -5px); opacity: 1; }
+        .btn-start-game:hover::after { transform: translate(5px, 5px); opacity: 1; }
+
+        @keyframes blinkText {
+            0%, 100% { opacity: 0.4; text-shadow: 0 0 2px transparent; }
+            50% { opacity: 1; text-shadow: 0 0 10px rgba(236, 226, 182, 0.6); }
+        }
+
+        /* Efek Flash Putih saat klik masuk game */
+        .white-flash {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+
+        /* --- Custom Scrollbar untuk Web Utama --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--gold-premium); border-radius: 3px; }
+
+        /* --- MAIN CONTENT LAYOUT --- */
+        #main-web-content {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1.5s ease 0.5s; /* muncul lembut setelah flash */
+        }
+
+        #main-web-content.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- FANTASY BACKGROUND EFFECTS --- */
+        .ambient-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -2; pointer-events: none; overflow: hidden;
+        }
+
+        .nebula-sphere { position: absolute; border-radius: 50%; filter: blur(130px); opacity: 0.12; }
+        .nebula-1 { width: 600px; height: 600px; background: var(--anemo-teal); top: -20%; right: -10%; }
+        .nebula-2 { width: 500px; height: 500px; background: #b287ff; bottom: -10%; left: -10%; }
+
+        #star-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+
+        /* --- NAVIGATION RPG MENU --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            padding: 20px 8%;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            background: rgba(13, 18, 29, 0.7);
+            border-bottom: 1px solid var(--fantasy-border);
+        }
+
+        .logo {
+            font-family: var(--font-fantasy);
+            font-weight: 700; font-size: 1.4rem; letter-spacing: 2px;
+            text-decoration: none; color: var(--gold-premium);
+            text-shadow: 0 0 8px rgba(236, 226, 182, 0.4);
+        }
+
+        nav ul { display: flex; list-style: none; gap: 35px; }
+        nav a {
+            text-decoration: none; color: var(--text-muted);
+            font-family: var(--font-fantasy); font-size: 0.85rem; letter-spacing: 2px;
+            transition: 0.3s; position: relative; padding: 5px 0;
+        }
+
+        nav a:hover, nav a.active { color: var(--gold-premium); text-shadow: 0 0 10px rgba(236, 226, 182, 0.6); }
+        nav a::after {
+            content: '✦'; position: absolute; bottom: -15px; left: 50%;
+            transform: translateX(-50%) scale(0); color: var(--gold-premium); font-size: 0.6rem; transition: 0.3s;
+        }
+        nav a:hover::after, nav a.active::after { transform: translateX(-50%) scale(1); }
+
+        /* --- HERO SECTION (CINEMATIC OPENING) --- */
+        .hero { height: 100vh; display: flex; align-items: center; padding: 0 8%; position: relative; }
+        .hero-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;
+            filter: brightness(0.45) contrast(1.05); animation: slowPan 40s ease-in-out infinite alternate;
+        }
+        @keyframes slowPan {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.06) translate(-10px, -10px); }
+        }
+        .hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, transparent 20%, var(--bg-dark) 95%); z-index: -1; }
+        .hero-content { max-width: 650px; z-index: 2; }
+        .hero-tag { font-family: var(--font-fantasy); color: var(--gold-premium); font-size: 0.85rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .hero h1 { font-family: var(--font-fantasy); font-size: 3.8rem; font-weight: 700; line-height: 1.2; margin-bottom: 25px; color: #fff; text-shadow: 0 2px 15px rgba(0,0,0,0.5); }
+        .hero p { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 40px; line-height: 1.7; }
+
+        .btn-rpg {
+            position: relative; padding: 14px 40px;
+            font-family: var(--font-fantasy); font-weight: 700; font-size: 0.85rem; letter-spacing: 2px;
+            color: var(--bg-dark); background: linear-gradient(135deg, #f5ecd2, #cebc87);
+            border: 1px solid var(--gold-premium); cursor: pointer; text-transform: uppercase;
+            text-decoration: none; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            transition: 0.3s; border-radius: 4px;
+        }
+        .btn-rpg:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(236, 226, 182, 0.4); background: linear-gradient(135deg, #fff, #ece2b6); }
+
+        /* --- ABOUT SECTION --- */
+        .about { padding: 120px 8%; position: relative; }
+        .section-title { font-family: var(--font-fantasy); font-size: 2.2rem; letter-spacing: 3px; margin-bottom: 60px; text-align: center; color: var(--gold-premium); }
+        .section-title span { display: block; font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; letter-spacing: 5px; }
+        .about-container { display: grid; grid-template-columns: 1fr 1.3fr; gap: 60px; align-items: center; max-width: 1100px; margin: 0 auto; }
+
+        .about-card { background: var(--bg-card); border: 2px solid rgba(236, 226, 182, 0.2); outline: 1px solid rgba(236, 226, 182, 0.05); outline-offset: -6px; border-radius: 4px; padding: 40px 30px; backdrop-filter: blur(8px); text-align: center; position: relative; }
+        .about-card::before, .about-card::after { content: '✦'; position: absolute; color: rgba(236, 226, 182, 0.4); font-size: 0.8rem; }
+        .about-card::before { top: 10px; left: 10px; }
+        .about-card::after { bottom: 10px; right: 10px; }
+
+        .profile-frame { width: 180px; height: 180px; margin: 0 auto 25px; border: 2px solid var(--gold-premium); transform: rotate(45deg); overflow: hidden; border-radius: 12px; }
+        .profile-frame img { width: 140%; height: 140%; object-fit: cover; transform: rotate(-45deg) translate(-15%, -15%); }
+        .about-card h3 { font-family: var(--font-fantasy); font-size: 1.4rem; color: #fff; margin-top: 15px; }
+        .about-card span { color: var(--gold-premium); font-size: 0.8rem; letter-spacing: 2px; display: block; margin-bottom: 25px; text-transform: uppercase; }
+        .skills-container { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .skill-tag { background: rgba(236, 226, 182, 0.05); padding: 6px 14px; border-radius: 2px; font-size: 0.8rem; border: 1px solid rgba(236, 226, 182, 0.15); color: var(--gold-premium); }
+        .about-text p { font-size: 1.05rem; line-height: 1.8; color: var(--text-muted); margin-bottom: 25px; }
+
+        /* --- PORTFOLIO GALLERY --- */
+        .portfolio { padding: 100px 8%; background: rgba(10, 14, 23, 0.6); }
+        .portfolio-tabs { display: flex; justify-content: center; gap: 20px; margin-bottom: 50px; list-style: none; }
+        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 10px 20px; font-family: var(--font-fantasy); font-size: 0.85rem; letter-spacing: 2px; cursor: pointer; transition: 0.3s; position: relative; }
+        .tab-btn.active, .tab-btn:hover { color: var(--gold-premium); }
+        .tab-btn.active::before { content: ''; position: absolute; bottom: 0; left: 20%; width: 60%; height: 1px; background: var(--gold-premium); box-shadow: 0 0 8px var(--gold-bright); }
+
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .gallery-item { position: relative; background: var(--bg-card); border: 1px solid var(--fantasy-border); aspect-ratio: 1/1; cursor: pointer; overflow: hidden; border-radius: 4px; }
+        .gallery-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .gallery-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(13, 18, 29, 0.95) 0%, rgba(13, 18, 29, 0.2) 60%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 25px; opacity: 0; transition: opacity 0.4s; }
+        .gallery-item:hover .gallery-img { transform: scale(1.05); }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
+        .gallery-item:hover { border-color: var(--gold-premium); box-shadow: 0 0 15px rgba(236, 226, 182, 0.15); }
+        .item-category { font-family: var(--font-fantasy); font-size: 0.75rem; color: var(--gold-premium); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; }
+        .item-title { font-family: var(--font-fantasy); font-size: 1.15rem; color: #fff; }
+
+        /* --- FANTASY MODAL --- */
+        .modal { position: fixed; inset: 0; background: rgba(8, 11, 18, 0.92); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(8px); padding: 30px; }
+        .modal.active { opacity: 1; pointer-events: all; }
+        .modal-content { background: #121a29; border: 2px solid var(--gold-premium); width: 100%; max-width: 1000px; max-height: 85vh; border-radius: 4px; overflow-y: auto; position: relative; display: grid; grid-template-columns: 1.1fr 1fr; box-shadow: 0 0 40px rgba(0,0,0,0.6); transform: scale(0.95); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal.active .modal-content { transform: scale(1); }
+        .modal-close { position: absolute; top: 15px; right: 15px; background: transparent; border: 1px solid var(--fantasy-border); color: var(--gold-premium); width: 35px; height: 35px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.3s; z-index: 10; }
+        .modal-close:hover { background: var(--gold-premium); color: var(--bg-dark); }
+        .modal-view-img { width: 100%; height: 100%; min-height: 350px; object-fit: cover; border-right: 1px solid var(--fantasy-border); }
+        .modal-body { padding: 35px; display: flex; flex-direction: column; justify-content: center; }
+        .modal-tag { font-family: var(--font-fantasy); color: var(--gold-premium); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+        .modal-title { font-family: var(--font-fantasy); font-size: 1.8rem; margin-bottom: 20px; color: #fff; }
+        .modal-desc { color: var(--text-muted); line-height: 1.7; margin-bottom: 25px; font-size: 0.95rem; }
+        .info-label { font-family: var(--font-fantasy); font-size: 0.8rem; color: var(--gold-premium); margin-bottom: 5px; letter-spacing: 1px; }
+
+        /* --- CONTACT SECTION --- */
+        .contact { padding: 100px 8%; text-align: center; }
+        .contact-box { max-width: 750px; margin: 0 auto; border: 1px solid var(--fantasy-border); padding: 50px 30px; background: var(--bg-card); position: relative; }
+        .contact p { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 35px; }
+        .social-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 35px; }
+        .social-icon { width: 50px; height: 50px; border-radius: 4px; border: 1px solid var(--fantasy-border); color: var(--text-muted); display: flex; justify-content: center; align-items: center; font-size: 1.2rem; text-decoration: none; transition: 0.3s; }
+        .social-icon:hover { color: var(--bg-dark); background: var(--gold-premium); border-color: var(--gold-premium); transform: translateY(-3px); }
+
+        footer { padding: 30px; text-align: center; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid rgba(236, 226, 182, 0.05); font-family: var(--font-fantasy); letter-spacing: 1px; }
+
+        @media (max-width: 992px) {
+            .title-logo-large { font-size: 2.5rem; }
+            .hero h1 { font-size: 2.8rem; }
+            .about-container { grid-template-columns: 1fr; gap: 40px; }
+            .modal-content { grid-template-columns: 1fr; max-height: 90vh; }
+            .modal-view-img { min-height: 250px; border-right: none; border-bottom: 1px solid var(--fantasy-border); }
+        }
+        @media (max-width: 768px) {
+            header { padding: 15px 5%; } nav { display: none; }
+            .hero { padding: 0 5%; } .hero h1 { font-size: 2.2rem; }
+            .gallery-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- STAGE 1: LOADING SCREEN -->
+    <div id="loading-screen">
+        <div class="loading-logo">AETHERIA</div>
+        <div class="loading-bar-container">
+            <div id="progress-bar" class="loading-bar"></div>
+        </div>
+    </div>
+
+    <!-- STAGE 2: GAME TITLE SCREEN (GATEKEEPER) -->
+    <div id="title-screen">
+        <!-- Background gerbang utama game (bisa kamu ganti gambar landscape pilar awan fantasi) -->
+        <img class="title-bg" src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1920" alt="Game Title Screen Background">
+        <div class="title-overlay"></div>
+        
+        <h1 class="title-logo-large">AETHERIA</h1>
+        <p class="title-sub">ARTWORK COMPENDIUM</p>
+        
+        <button class="btn-start-game" onclick="enterWebsite()">TAP TO START</button>
+    </div>
+
+    <!-- WHITE FLASH TRANSITION EFFECT -->
+    <div id="flash" class="white-flash"></div>
+
+
+    <!-- STAGE 3: MAIN WEBSITE CONTENT -->
+    <div id="main-web-content">
+        <!-- RPG AMBIENT LIGHTS -->
+        <div class="ambient-glow">
+            <div class="nebula-sphere nebula-1"></div>
+            <div class="nebula-sphere nebula-2"></div>
+        </div>
+        <canvas id="star-canvas"></canvas>
+
+        <!-- HEADER / NAVIGATION -->
+        <header>
+            <a href="#" class="logo">✦ AETHERIA</a>
+            <nav>
+                <ul>
+                    <li><a href="#home" class="active">ARCHIVE</a></li>
+                    <li><a href="#about">CREATOR</a></li>
+                    <li><a href="#portfolio">GALLERY</a></li>
+                    <li><a href="#contact">CONNECTION</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- HERO SECTION -->
+        <section id="home" class="hero">
+            <img class="hero-bg" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920" alt="Anime Fantasy Landscape">
+            <div class="hero-overlay"></div>
+            
+            <div class="hero-content" data-aos="fade-up" data-aos-duration="1200">
+                <span class="hero-tag">✦ Visual Storyteller & Illustrator</span>
+                <h1>Coretan Imajinasi di Semesta Fantasi</h1>
+                <p>Mahasiswa DKV yang memadukan keindahan lanskap magis klasik dengan desain karakter bergaya gim petualangan RPG. Menghidupkan kisah melalui goresan kuas digital imersif.</p>
+                <a href="#portfolio" class="btn-rpg">Buka Kompendium</a>
+            </div>
+        </section>
+
+        <!-- ABOUT ME SECTION -->
+        <section id="about" class="about">
+            <h2 class="section-title" data-aos="fade-up">I. Ringkasan Kisah<span>THE CREATOR</span></h2>
+            <div class="about-container">
+                <div class="about-card" data-aos="fade-right" data-aos-duration="1000">
+                    <div class="profile-frame">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=500" alt="Avatar Desainer">
+                    </div>
+                    <h3>Nama Kamu</h3>
+                    <span>DKV Concept Artist</span>
+                    <div class="skills-container">
+                        <span class="skill-tag">Ilustrasi</span>
+                        <span class="skill-tag">Concept Art</span>
+                        <span class="skill-tag">Desain Karakter</span>
+                    </div>
+                </div>
+                
+                <div class="about-text" data-aos="fade-left" data-aos-duration="1000">
+                    <p>Salam, Penjelajah! Saya adalah mahasiswa Desain Komunikasi Visual (DKV) yang mendedikasikan media gambar digital untuk merekam keindahan fiksi epik, mitologi, dan petualangan fantasi.</p>
+                    <p>Gaya gambar saya banyak dipengaruhi oleh keanggunan seni visual gim petualangan *open-world*, berfokus pada pencahayaan alami yang lembut, lingkungan arsitektur kuno, serta detail ekspresi karakter yang kuat.</p>
+                    <p style="border-left: 2px solid var(--gold-premium); padding-left: 15px; font-style: italic;">
+                        "Menangkap esensi magis yang tersembunyi di dalam narasi visual."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PORTFOLIO GALLERY -->
+        <section id="portfolio" class="portfolio">
+            <h2 class="section-title" data-aos="fade-up">II. Galeri Karya<span>VISUAL ARCHIVE</span></h2>
+            
+            <div class="portfolio-tabs" data-aos="fade-up">
+                <button class="tab-btn active" onclick="filterGallery('all')">SEMUA</button>
+                <button class="tab-btn" onclick="filterGallery('character')">KARAKTER</button>
+                <button class="tab-btn" onclick="filterGallery('illustration')">ILUSTRASI</button>
+                <button class="tab-btn" onclick="filterGallery('concept')">KONSEP</button>
+            </div>
+
+            <div class="gallery-grid" data-aos="fade-up">
+                <div class="gallery-item" data-category="character" onclick="openProject('The Forest Mage', 'Desain karakter penyihir pelindung hutan kuno dengan jubah rajutan wol tradisional.', 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=800', 'Clip Studio Paint')">
+                    <img class="gallery-img" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=800" alt="Character 1">
+                    <div class="gallery-overlay">
+                        <span class="item-category">Character Design</span>
+                        <h3 class="item-title">The Forest Mage</h3>
+                    </div>
+                </div>
+
+                <div class="gallery-item" data-category="illustration" onclick="openProject('Fading Light in Ruins', 'Ilustrasi sisa-sisa kastil tua di bawah langit senja keemasan.', 'https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=800', 'Photoshop, Procreate')">
+                    <img class="gallery-img" src="https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=800" alt="Illustration 1">
+                    <div class="gallery-overlay">
+                        <span class="item-category">Illustration</span>
+                        <h3 class="item-title">Fading Light in Ruins</h3>
+                    </div>
+                </div>
+
+                <div class="gallery-item" data-category="concept" onclick="openProject('Sky Sanctuary', 'Arsitektur pulau melayang di atas awan, terinspirasi dari kuil pemujaan klasik.', 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800', 'Photoshop')">
+                    <img class="gallery-img" src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800" alt="Concept 1">
+                    <div class="gallery-overlay">
+                        <span class="item-category">Concept Art</span>
+                        <h3 class="item-title">Sky Sanctuary</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROJECT DETAIL MODAL -->
+        <div id="projectModal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeProject()"><i class="fa-solid fa-xmark"></i></button>
+                <img id="modalImg" class="modal-view-img" src="" alt="Project">
+                <div class="modal-body">
+                    <span id="modalTag" class="modal-tag">Kategori</span>
+                    <h2 id="modalTitle" class="modal-title">Nama Proyek</h2>
+                    <p id="modalDesc" class="modal-desc">Deskripsi proses.</p>
+                    <div class="modal-meta">
+                        <h4 class="info-label">Peralatan Seni:</h4>
+                        <p id="modalTools" style="color: var(--gold-premium); font-size: 0.9rem;">Photoshop</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACT SECTION -->
+        <section id="contact" class="contact">
+            <div class="contact-box" data-aos="zoom-in">
+                <h2 class="section-title" style="margin-bottom: 15px;">III. Hubungkan Signal<span>CONTACT</span></h2>
+                <p>Mari berkolaborasi membuat petualangan visual baru atau diskusikan kebutuhan proyek komersial Anda.</p>
+                <div class="social-links">
+                    <a href="#" target="_blank" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fa-solid fa-envelope"></i></a>
+                    <a href="#" target="_blank" class="social-icon"><i class="fa-brands fa-artstation"></i></a>
+                </div>
+                <a href="mailto:emailmu@student.id" class="btn-rpg">Kirim Pesan</a>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>&copy; 2026 AETHERIA. DKV Art Collection Portfolio.</p>
+        </footer>
+    </div>
+
+    <!-- LIBRARIES -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        // --- LOGIC 1: SIMULASI LOADING BAR ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const progressBar = document.getElementById('progress-bar');
+            let width = 0;
+            
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    // Hilangkan loading screen, munculkan Title Screen
+                    document.getElementById('loading-screen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').style.display = 'none';
+                        document.getElementById('title-screen').classList.add('active');
+                    }, 800);
+                } else {
+                    width += Math.floor(Math.random() * 15) + 5; // Loading dinamis acak
+                    if(width > 100) width = 100;
+                    progressBar.style.width = width + '%';
+                }
+            }, 150);
+        });
+
+        // --- LOGIC 2: TOMBOL MASUK KE PORTFOLIO (FLASH TRANSITION) ---
+        function enterWebsite() {
+            const flash = document.getElementById('flash');
+            const titleScreen = document.getElementById('title-screen');
+            const mainContent = document.getElementById('main-web-content');
+
+            // 1. Jalankan flash putih (Khas transisi game miHoYo)
+            flash.style.pointerEvents = 'all';
+            flash.style.opacity = '1';
+
+            setTimeout(() => {
+                // 2. Sembunyikan Title Screen, Aktifkan Web Utama
+                titleScreen.classList.remove('active');
+                titleScreen.style.display = 'none';
+                mainContent.classList.add('visible');
+                document.body.style.overflow = 'auto'; // Aktifkan scroll web
+
+                // Inisialisasi AOS setelah web dirender terbuka
+                AOS.init({ duration: 800, once: true });
+                
+                // 3. Pudarkan efek flash putih secara perlahan
+                flash.style.opacity = '0';
+                flash.style.pointerEvents = 'none';
+            }, 700);
+        }
+
+        // --- BACKGROUND STARLIGHT CANVAS ---
+        const canvas = document.getElementById('star-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.3;
+                this.blinkSpeed = Math.random() * 0.02 + 0.005;
+                this.alpha = Math.random();
+                this.direction = Math.random() > 0.5 ? 1 : -1;
+            }
+            update() {
+                this.alpha += this.blinkSpeed * this.direction;
+                if (this.alpha > 0.9 || this.alpha < 0.1) this.direction *= -1;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(236, 226, 182, ${this.alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        for(let i=0; i<60; i++) stars.push(new Star());
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            stars.forEach(s => { s.update(); s.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- GALLERY FILTER ---
+        function filterGallery(cat) {
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const items = document.querySelectorAll('.gallery-item');
+            items.forEach(item => {
+                if (cat === 'all' || item.getAttribute('data-category') === cat) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // --- MODAL SYSTEM ---
+        const modal = document.getElementById('projectModal');
+        function openProject(title, desc, img, tools) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalDesc').innerText = desc;
+            document.getElementById('modalImg').src = img;
+            document.getElementById('modalTools').innerText = tools;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeProject() {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        window.onclick = function(e) { if (e.target == modal) closeProject(); }
+    </script>
+</body>
+</html>
